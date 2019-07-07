@@ -159,6 +159,30 @@ function love.update(dt)
         else
             ball.dx = -math.random(140, 200)
         end
+
+
+        -- for my own information-------------------------------------------------------------------------------
+        T = love.timer.getTime()
+        TIME_START = love.timer.getTime()
+        YI = math.floor(ball.y + 0.5)
+        DY = math.floor(ball.dy + 0.5)
+        DX = math.floor(ball.dx + 0.5)
+        PYI = math.floor(player1.y)
+
+        ME_Y = math.floor(100 * (           YI + (-200*DY/DX)                       + 0.5)) / 100
+
+        while (ME_Y > 239)
+        do
+          ME_Y = 239 * 2 - ME_Y
+        end
+
+        if ME_Y < 0 then
+          ME_Y = math.abs(ME_Y)
+        end
+
+        TIME_NEEDED = math.abs(ME_Y - PYI) / PADDLE_SPEED
+        TIME_DELAY = (-200/DX) - TIME_NEEDED
+
     elseif gameState == 'play' then
         -- detect ball collision with paddles, reversing dx if true and
         -- slightly increasing it, then altering the dy based on the position
