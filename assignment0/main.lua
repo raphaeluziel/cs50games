@@ -50,6 +50,21 @@ VIRTUAL_HEIGHT = 243
 -- paddle movement speed
 PADDLE_SPEED = 200
 
+-- timer (needed for my own information)
+-- variables for debugging
+T = 0
+DX = 0
+DY = 0
+YI = 0
+YF = 0
+ME_Y = 0
+PYI = 0
+TIME_ELAPSED = 0
+TIME_DELAY = 0
+TIME_NEEDED = 0
+TIME_START = 0
+ME_PY = 0
+
 --[[
     Called just once at the beginning of the game; used to set up
     game objects, variables, etc. and prepare the game world.
@@ -90,7 +105,7 @@ function love.load()
 
     -- initialize our player paddles; make them global so that they can be
     -- detected by other functions and modules
-    player1 = Paddle(10, 30, 5, 20)
+    player1 = Paddle(5, 30, 5, 20)
     player2 = Paddle(VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 30, 5, 20)
 
     -- place a ball in the middle of the screen
@@ -172,6 +187,28 @@ function love.update(dt)
                 ball.dy = math.random(10, 150)
             end
 
+            -- for my own information-------------------------------------------------------------------------------
+            T = love.timer.getTime()
+            TIME_START = love.timer.getTime()
+            YI = math.floor(ball.y + 0.5)
+            DY = math.floor(ball.dy + 0.5)
+            DX = math.floor(ball.dx + 0.5)
+            PYI = math.floor(player1.y)
+
+            ME_Y = math.floor(100 * (           YI + (-413*DY/DX)                       + 0.5)) / 100
+
+            while (ME_Y > 239)
+            do
+              ME_Y = 239 * 2 - ME_Y
+            end
+
+            if ME_Y < 0 then
+              ME_Y = math.abs(ME_Y)
+            end
+
+            TIME_NEEDED = math.abs(ME_Y - PYI) / PADDLE_SPEED
+            TIME_DELAY = (-413/DX) - TIME_NEEDED
+
             sounds['paddle_hit']:play()
         end
 
@@ -196,6 +233,14 @@ function love.update(dt)
             servingPlayer = 1
             player2Score = player2Score + 1
             sounds['score']:play()
+
+            -- To tell me how long ball takes to get to AI player-----------------------------------------
+            T = math.floor(100 * (love.timer.getTime() - T) + 0.5) / 100
+            YF = math.floor(ball.y + 0.5)
+
+
+
+
 
             -- if we've reached a score of 10, the game is over; set the
             -- state to done so we can show the victory message
@@ -232,8 +277,19 @@ function love.update(dt)
     --
     -- paddles can move no matter what state we're in
     --
-    -- player 1 (the AI controlled paddle)
-    player1.y = ball.y
+    -- player 1 (the AI controlled paddle) -------------------------------------------------------------------
+    TIME_ELAPSED = love.timer.getTime() - TIME_START
+    if TIME_ELAPSED >= TIME_DELAY and gameState == 'play' and ball.dx < 0 then
+      if player1.y > ME_Y then
+        player1.dy = -PADDLE_SPEED
+      elseif player1.y < ME_Y then
+        player1.dy = PADDLE_SPEED
+      else
+        player1.dy = 0
+      end
+    else
+      player1.dy = 0
+    end
 
     -- player 2
     if love.keyboard.isDown('up') then
@@ -250,7 +306,7 @@ function love.update(dt)
         ball:update(dt)
     end
 
-    --player1:update(dt)
+    player1:update(dt)
     player2:update(dt)
 end
 
@@ -334,7 +390,9 @@ function love.draw()
     ball:render()
 
     -- display FPS for debugging; simply comment out to remove
-    -- displayFPS()
+    displayFPS()
+    displayMsgs()
+    displayMsgsB()
 
     -- end our drawing to push
     push:apply('end')
@@ -355,11 +413,24 @@ end
 --[[
     Renders the current FPS.
 ]]
---[[
 function displayFPS()
     -- simple FPS display across all states
     love.graphics.setFont(smallFont)
     love.graphics.setColor(0, 255, 0, 255)
-    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, 10)
+    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 20, 10)
 end
-]]
+
+
+function displayMsgs()
+    -- message display across all states
+    love.graphics.setFont(smallFont)
+    love.graphics.setColor(0, 190, 0, 255)
+    love.graphics.print('yi = ' .. tostring(YI) .. ', yf = ' .. tostring(YF) .. ', t = ' .. tostring(T) .. ', dx = ' .. tostring(DX) .. ', dy = ' .. tostring(DY) .. '     ME_Y = ' .. tostring(ME_Y), 20, 213)
+end
+
+function displayMsgsB()
+    -- message display across all states
+    love.graphics.setFont(smallFont)
+    love.graphics.setColor(0, 190, 0, 255)
+    love.graphics.print('ball.dx = ' .. tostring(ball.dx) .. ', time elapsed = ' .. tostring(math.floor(TIME_ELAPSED)) .. ' time delay = ' .. tostring(TIME_DELAY), 20, 223)
+end
