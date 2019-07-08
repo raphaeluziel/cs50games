@@ -50,20 +50,25 @@ VIRTUAL_HEIGHT = 243
 -- paddle movement speed
 PADDLE_SPEED = 200
 
--- timer (needed for my own information)
--- variables for debugging
-T = 0
-DX = 0
-DY = 0
-YI = 0
-YF = 0
-ME_Y = 0
-PYI = 0
-TIME_ELAPSED = 0
-TIME_DELAY = 0
-TIME_NEEDED = 0
-TIME_START = 0
-ME_PY = 0
+--[[  --AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  yP is just a variable to hold the y value where the AI paddle should be in
+  order to hit the ball.  timeStart, timeElapsed, and timeToWait are there to
+  allow the AI paddle to wait until the last moment to move, at the given paddle
+  in order to reach the ball.  timePlayerAlive is going to be used to calculate
+  score, since, if I coded everything correctly, there will be no way for the
+  player to score against the AI.  timePlayerAlive will measure how long a player
+  remains alive until ball goes through.  scaledScore will be the actual score
+  for the entire game, based on the time.  livesLeft: after 10 scores by AI,
+  game is over
+]]
+yP = 0
+timeStart = 0
+timeElapsed = 0
+timeToWait = 0
+timeGameBegan = 0
+timePlayerAlive = 0
+scaledScore = 0
+livesLeft = 10
 
 --[[
     Called just once at the beginning of the game; used to set up
@@ -76,7 +81,7 @@ function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
     -- set the title of our application window
-    love.window.setTitle('Pong - the AI update')
+    love.window.setTitle('Pong')
 
     -- seed the RNG so that calls to random are always random
     math.randomseed(os.time())
@@ -105,7 +110,7 @@ function love.load()
 
     -- initialize our player paddles; make them global so that they can be
     -- detected by other functions and modules
-    player1 = Paddle(5, 30, 5, 20)
+    player1 = Paddle(10, 30, 5, 20)
     player2 = Paddle(VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 30, 5, 20)
 
     -- place a ball in the middle of the screen
@@ -160,30 +165,17 @@ function love.update(dt)
             ball.dx = -math.random(140, 200)
         end
 
-
-        -- for my own information-------------------------------------------------------------------------------
-        T = love.timer.getTime()
-        TIME_START = love.timer.getTime()
-        YI = math.floor(ball.y + 0.5)
-        DY = math.floor(ball.dy + 0.5)
-        DX = math.floor(ball.dx + 0.5)
-        PYI = math.floor(player1.y)
-
-        ME_Y = math.floor(100 * (           YI + (-200*DY/DX)                       + 0.5)) / 100
-
-        while (ME_Y > 239)
-        do
-          ME_Y = 239 * 2 - ME_Y
-        end
-
-        if ME_Y < 0 then
-          ME_Y = math.abs(ME_Y)
-        end
-
-        TIME_NEEDED = math.abs(ME_Y - PYI) / PADDLE_SPEED
-        TIME_DELAY = (-200/DX) - TIME_NEEDED
+        --AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        -- figure out the y position of the ball when it reaches the AI
+        yP = getY()
+        -- begin measuring time for scorekeeping and to tell when AI should move
+        timeStart = love.timer.getTime()
+        timeGameBegan = love.timer.getTime()
 
     elseif gameState == 'play' then
+
+      -- scoring will be realted to how long a player remains alive
+      timePlayerAlive = love.timer.getTime() - timeGameBegan
         -- detect ball collision with paddles, reversing dx if true and
         -- slightly increasing it, then altering the dy based on the position
         -- at which it collided, then playing a sound effect
@@ -211,27 +203,10 @@ function love.update(dt)
                 ball.dy = math.random(10, 150)
             end
 
-            -- for my own information-------------------------------------------------------------------------------
-            T = love.timer.getTime()
-            TIME_START = love.timer.getTime()
-            YI = math.floor(ball.y + 0.5)
-            DY = math.floor(ball.dy + 0.5)
-            DX = math.floor(ball.dx + 0.5)
-            PYI = math.floor(player1.y)
-
-            ME_Y = math.floor(100 * (           YI + (-413*DY/DX)                       + 0.5)) / 100
-
-            while (ME_Y > 239)
-            do
-              ME_Y = 239 * 2 - ME_Y
-            end
-
-            if ME_Y < 0 then
-              ME_Y = math.abs(ME_Y)
-            end
-
-            TIME_NEEDED = math.abs(ME_Y - PYI) / PADDLE_SPEED
-            TIME_DELAY = (-413/DX) - TIME_NEEDED
+            -- calculate where the ball will be when it reaches the AI --AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+            yP = getY()
+            -- start measuring time for purposes of telling AI when to begin move
+            timeStart = love.timer.getTime()
 
             sounds['paddle_hit']:play()
         end
@@ -254,28 +229,15 @@ function love.update(dt)
         -- if we reach the left edge of the screen, go back to serve
         -- and update the score and serving player
         if ball.x < 0 then
+          -- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+          --[[
+            Changes made here. In the rare instances the AI fails to get to
+            ball, plyer2 will be awarded 50 points
+          ]]
+            scaledScore = scaledScore + 50
             servingPlayer = 1
-            player2Score = player2Score + 1
             sounds['score']:play()
 
-            -- To tell me how long ball takes to get to AI player-----------------------------------------
-            T = math.floor(100 * (love.timer.getTime() - T) + 0.5) / 100
-            YF = math.floor(ball.y + 0.5)
-
-
-
-
-
-            -- if we've reached a score of 10, the game is over; set the
-            -- state to done so we can show the victory message
-            if player2Score == 10 then
-                winningPlayer = 2
-                gameState = 'done'
-            else
-                gameState = 'serve'
-                -- places the ball in the middle of the screen, no velocity
-                ball:reset()
-            end
         end
 
         -- if we reach the right edge of the screen, go back to serve
@@ -283,12 +245,34 @@ function love.update(dt)
         if ball.x > VIRTUAL_WIDTH then
             servingPlayer = 2
             player1Score = player1Score + 1
+
+            --AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+            --[[
+              calculate scaledScore based on total time.  10 points will be added
+              for every 10 seconds player is alive from the beginning of the game,
+              20 points added for every 10 seconds alive after 100 seconds, ...
+            ]]
+            livesLeft = livesLeft - 1
+            while timePlayerAlive > 10
+            do
+              m = math.floor(math.log10(timePlayerAlive))
+              scaledScore = scaledScore + 10 * m * math.floor(timePlayerAlive / 10)
+              timePlayerAlive = timePlayerAlive - 10 * m * math.floor(timePlayerAlive / 10)
+            end
+
             sounds['score']:play()
 
             -- if we've reached a score of 10, the game is over; set the
             -- state to done so we can show the victory message
+            -- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+            --[[
+              Changed so that winningPlayer will always be player2, but game is
+              still over after the AI scores 10 times.  The player's score is
+              based on the time he was alive for each of the 10 strikes the Ai made
+            ]]
+
             if player1Score == 10 then
-                winningPlayer = 1
+                winningPlayer = 2 -- changed from 1 to 2 since 2 will alwyas win
                 gameState = 'done'
             else
                 gameState = 'serve'
@@ -301,18 +285,19 @@ function love.update(dt)
     --
     -- paddles can move no matter what state we're in
     --
-    -- player 1 (the AI controlled paddle) -------------------------------------------------------------------
-    TIME_ELAPSED = love.timer.getTime() - TIME_START
-    if TIME_ELAPSED >= TIME_DELAY and gameState == 'play' and ball.dx < 0 then
-      if player1.y > ME_Y then
-        player1.dy = -PADDLE_SPEED
-      elseif player1.y < ME_Y then
+    -- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    -- player 1 is now the AI
+    if gameState == 'play' then
+      timeElapsed = love.timer.getTime() - timeStart
+
+      -- wait until the last moment, then move the AI at given PADDLE_SPEED
+      if player1.y < yP - 2 and timeElapsed > timeToWait then
         player1.dy = PADDLE_SPEED
+      elseif player1.y > yP + 2 and timeElapsed > timeToWait then
+        player1.dy = -PADDLE_SPEED
       else
         player1.dy = 0
       end
-    else
-      player1.dy = 0
     end
 
     -- player 2
@@ -400,23 +385,25 @@ function love.draw()
     elseif gameState == 'done' then
         -- UI messages
         love.graphics.setFont(largeFont)
-        love.graphics.printf('Player ' .. tostring(winningPlayer) .. ' wins!',
+        love.graphics.printf('Final score ' .. tostring(scaledScore) .. '!',
             0, 10, VIRTUAL_WIDTH, 'center')
         love.graphics.setFont(smallFont)
         love.graphics.printf('Press Enter to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
     end
 
     -- show the score before ball is rendered so it can move over the text
-    displayScore()
+    displayScore() -- the score will now be related to how long the player can survive
+
 
     player1:render()
     player2:render()
     ball:render()
 
     -- display FPS for debugging; simply comment out to remove
-    displayFPS()
-    displayMsgs()
-    displayMsgsB()
+    --displayFPS()
+    displayPlayer1Score()
+    displayLives()
+
 
     -- end our drawing to push
     push:apply('end')
@@ -428,33 +415,43 @@ end
 function displayScore()
     -- score display
     love.graphics.setFont(scoreFont)
-    love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - 50,
-        VIRTUAL_HEIGHT / 3)
-    love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + 30,
-        VIRTUAL_HEIGHT / 3)
+    love.graphics.print(tostring(scaledScore), VIRTUAL_WIDTH / 2,
+        VIRTUAL_HEIGHT / 5)
 end
 
---[[
-    Renders the current FPS.
-]]
+
+-- Renders the current FPS.
 function displayFPS()
     -- simple FPS display across all states
     love.graphics.setFont(smallFont)
     love.graphics.setColor(0, 255, 0, 255)
-    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 20, 10)
+    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, 10)
 end
 
-
-function displayMsgs()
-    -- message display across all states
+-- display lives left.
+function displayLives()
+    -- simple FPS display across all states
     love.graphics.setFont(smallFont)
-    love.graphics.setColor(0, 190, 0, 255)
-    love.graphics.print('yi = ' .. tostring(YI) .. ', yf = ' .. tostring(YF) .. ', t = ' .. tostring(T) .. ', dx = ' .. tostring(DX) .. ', dy = ' .. tostring(DY) .. '     ME_Y = ' .. tostring(ME_Y), 20, 213)
+    love.graphics.setColor(192, 0, 0, 255)
+    love.graphics.print('Lives left: ' .. tostring(livesLeft), VIRTUAL_WIDTH - 80, 10)
 end
 
-function displayMsgsB()
-    -- message display across all states
+-- Plyaer's score display
+function displayPlayer1Score()
+    -- score display
     love.graphics.setFont(smallFont)
-    love.graphics.setColor(0, 190, 0, 255)
-    love.graphics.print('ball.dx = ' .. tostring(ball.dx) .. ', time elapsed = ' .. tostring(math.floor(TIME_ELAPSED)) .. ' time delay = ' .. tostring(TIME_DELAY), 20, 223)
+    love.graphics.setColor(0, 152, 0, 255)
+    love.graphics.print('Time Alive = ' .. tostring(math.floor(timePlayerAlive)) .. ' s  (scoring: 10 points per 10  alive, 20 per 10 s alive after 100 s, ...', 10, 223)
+end
+
+function getY()
+  t = -((ball.x - 15) / ball.dx)
+  y = ball.y + ball.dy * t
+  if y > VIRTUAL_HEIGHT - 4 then
+    y = 2 * (VIRTUAL_HEIGHT - 4) - y
+  elseif y < 0 then
+    y = -y
+  end
+  timeToWait = t - math.abs(player1.y - y) / PADDLE_SPEED
+  return y - 10
 end
