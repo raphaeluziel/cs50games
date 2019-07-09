@@ -237,6 +237,8 @@ function love.update(dt)
             scaledScore = scaledScore + 50
             servingPlayer = 1
             sounds['score']:play()
+            gamestate = 'serve'
+            ball.reset()
 
         end
 
@@ -273,6 +275,7 @@ function love.update(dt)
 
             if player1Score == 10 then
                 winningPlayer = 2 -- changed from 1 to 2 since 2 will alwyas win
+                livesLeft = 10
                 gameState = 'done'
             else
                 gameState = 'serve'
