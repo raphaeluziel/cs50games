@@ -237,8 +237,8 @@ function love.update(dt)
             scaledScore = scaledScore + 50
             servingPlayer = 1
             sounds['score']:play()
-            gamestate = 'serve'
-            ball.reset()
+            gameState = 'serve'
+            ball:reset()
 
         end
 
@@ -350,6 +350,7 @@ function love.keypressed(key)
             -- reset scores to 0
             player1Score = 0
             player2Score = 0
+            scaledScore = 0
 
             -- decide serving player as the opposite of who won
             if winningPlayer == 1 then
