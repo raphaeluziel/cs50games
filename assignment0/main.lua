@@ -445,7 +445,7 @@ function displayPlayer1Score()
     -- score display
     love.graphics.setFont(smallFont)
     love.graphics.setColor(0, 152, 0, 255)
-    love.graphics.print('Time Alive = ' .. tostring(math.floor(timePlayerAlive)) .. ' s  (scoring: 10 points per 10  alive, 20 per 10 s alive after 100 s, ...', 10, 223)
+    love.graphics.print('Time Alive = ' .. tostring(math.floor(timePlayerAlive)) .. ' s  (scoring: 10 points per 10 s alive, 20 per 10 s alive after 100 s, ...', 10, 223)
 end
 
 function getY()
