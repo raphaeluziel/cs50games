@@ -35,6 +35,7 @@ function PipePair:init(y)
 end
 
 function PipePair:update(dt)
+  if not paused then
     -- remove the pipe from the scene if it's beyond the left edge of the screen,
     -- else move it from right to left
     if self.x > -PIPE_WIDTH then
@@ -44,6 +45,7 @@ function PipePair:update(dt)
     else
         self.remove = true
     end
+  end
 end
 
 function PipePair:render()

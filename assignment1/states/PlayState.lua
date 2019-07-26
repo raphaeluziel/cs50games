@@ -30,9 +30,23 @@ function PlayState:init()
     self.lastY = -PIPE_HEIGHT + math.random(80) + 20
 end
 
+
 function PlayState:update(dt)
+
+  if love.keyboard.wasPressed('p') or love.keyboard.wasPressed('P') then
+    if paused then
+      paused = false
+      sounds['music']:play()
+      print("NOT PAUSED")
+    else
+      paused = true
+      sounds['music']:stop()
+      print("PAUSED")
+    end
+  end
+
     -- update timer for pipe spawning
-    self.timer = self.timer + dt
+    if not paused then self.timer = self.timer + dt end
 
     -- spawn a new pipe pair every second and a half
     if self.timer > spawnTime then
