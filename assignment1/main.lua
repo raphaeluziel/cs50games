@@ -109,8 +109,7 @@ function love.load()
         ['title'] = function() return TitleScreenState() end,
         ['countdown'] = function() return CountdownState() end,
         ['play'] = function() return PlayState() end,
-        ['score'] = function() return ScoreState() end,
-        ['pause'] = function() return PauseState() end
+        ['score'] = function() return ScoreState() end
     }
     gStateMachine:change('title')
 
@@ -159,6 +158,9 @@ end
 
 function love.update(dt)
     -- scroll our background and ground, looping back to 0 after a certain amount
+
+    -- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    -- When p key pressed pause the scrolling
   if not paused then
     backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
     groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH

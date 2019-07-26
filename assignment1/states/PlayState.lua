@@ -17,8 +17,9 @@ PIPE_HEIGHT = 288
 BIRD_WIDTH = 38
 BIRD_HEIGHT = 24
 
+-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+-- Randomize the spawn time of the pipes
 spawnTime = math.random(140, 280) / 100
-print('spawnTime = ' .. tostring(spawnTime))
 
 function PlayState:init()
     self.bird = Bird()
@@ -33,19 +34,21 @@ end
 
 function PlayState:update(dt)
 
+  -- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  -- pause the music
   if love.keyboard.wasPressed('p') or love.keyboard.wasPressed('P') then
     if paused then
       paused = false
       sounds['music']:play()
-      print("NOT PAUSED")
     else
       paused = true
       sounds['music']:stop()
-      print("PAUSED")
     end
   end
 
+    -- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     -- update timer for pipe spawning
+    -- Stop spawining pipes when paused
     if not paused then self.timer = self.timer + dt end
 
     -- spawn a new pipe pair every second and a half
@@ -53,10 +56,11 @@ function PlayState:update(dt)
         -- modify the last Y coordinate we placed so pipe gaps aren't too far apart
         -- no higher than 10 pixels below the top edge of the screen,
         -- and no lower than a gap length from the bottom
+
+        -- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        -- Randomize the gap height and the spawn time
         gapHeight = math.random(60, 120)
-        print('gapHeight = ' .. tostring(gapHeight))
         spawnTime = math.random(140, 280) / 100
-        print('spawnTime = ' .. tostring(spawnTime))
         local y = math.max(-PIPE_HEIGHT + 10,
             math.min(self.lastY + math.random(-20, 20), VIRTUAL_HEIGHT - gapHeight - PIPE_HEIGHT))
         self.lastY = y

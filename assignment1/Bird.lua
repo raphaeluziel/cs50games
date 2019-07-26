@@ -10,6 +10,9 @@
 
 Bird = Class{}
 
+
+-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+-- Changed gravity for older folks like me to be able to play the game, and test it
 local GRAVITY = 2
 
 function Bird:init()
@@ -42,6 +45,9 @@ function Bird:collides(pipe)
 end
 
 function Bird:update(dt)
+
+  -- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  -- Stop bird from moving when paused
   if not paused then
     self.dy = self.dy + GRAVITY * dt
 

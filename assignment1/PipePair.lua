@@ -11,8 +11,9 @@
 PipePair = Class{}
 
 -- size of the gap between pipes
+-- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+-- make the gap height random
 gapHeight= math.random(60, 120)
-print ('gapHeight = ' .. tostring(gapHeight))
 
 function PipePair:init(y)
     -- flag to hold whether this pair has been scored (jumped through)

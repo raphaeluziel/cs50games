@@ -29,6 +29,8 @@ end
 
 function ScoreState:render()
     -- simply render the score to the middle of the screen
+    -- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    -- Added different medals depending on how high the score is
   if self.score > 10 then
     scoreMessage = 'You earned a Gold medal!'
     medal = love.graphics.newImage('gold.png')
