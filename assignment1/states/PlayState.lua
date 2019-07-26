@@ -35,7 +35,7 @@ end
 function PlayState:update(dt)
 
   -- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-  -- pause the music
+  -- pause the music, and play pause sound from bxfr
   if love.keyboard.wasPressed('p') or love.keyboard.wasPressed('P') then
     if paused then
       paused = false
@@ -43,6 +43,7 @@ function PlayState:update(dt)
     else
       paused = true
       sounds['music']:stop()
+      sounds['pause']:play()
     end
   end
 

@@ -64,6 +64,8 @@ local BACKGROUND_LOOPING_POINT = 413
 
 -- global variable we can use to pause the game
 paused = false
+-- pause icon
+pause_icon = love.graphics.newImage('pause.png')
 
 function love.load()
     -- initialize our nearest-neighbor filter
@@ -83,11 +85,14 @@ function love.load()
     love.graphics.setFont(flappyFont)
 
     -- initialize our table of sounds
+    -- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    -- Added the pause sound from bfxr
     sounds = {
         ['jump'] = love.audio.newSource('jump.wav', 'static'),
         ['explosion'] = love.audio.newSource('explosion.wav', 'static'),
         ['hurt'] = love.audio.newSource('hurt.wav', 'static'),
         ['score'] = love.audio.newSource('score.wav', 'static'),
+        ['pause'] = love.audio.newSource('pause.wav', 'static'),
 
         -- https://freesound.org/people/xsgianni/sounds/388079/
         ['music'] = love.audio.newSource('marios_way.mp3', 'static')
@@ -131,6 +136,7 @@ function love.keypressed(key)
     if key == 'escape' then
         love.event.quit()
     end
+
 end
 
 --[[
@@ -178,6 +184,12 @@ function love.draw()
     love.graphics.draw(background, -backgroundScroll, 0)
     gStateMachine:render()
     love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
+
+    -- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    -- Show pause icon when p is pressed
+    if paused then
+      love.graphics.draw(pause_icon, 0, 150)
+    end
 
     push:finish()
 end
