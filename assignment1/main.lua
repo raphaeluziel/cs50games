@@ -188,7 +188,7 @@ function love.draw()
     -- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     -- Show pause icon when p is pressed
     if paused then
-      love.graphics.draw(pause_icon, 0, 150)
+      love.graphics.draw(pause_icon, VIRTUAL_WIDTH / 2 - 100, VIRTUAL_HEIGHT / 2 - 100)
     end
 
     push:finish()
