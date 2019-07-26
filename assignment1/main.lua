@@ -98,6 +98,17 @@ function love.load()
         ['music'] = love.audio.newSource('marios_way.mp3', 'static')
     }
 
+    -- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    -- lowered the volume of the sounds
+    sounds['music']:setVolume(0.05)
+    sounds['jump']:setVolume(0.1)
+    sounds['explosion']:setVolume(0.1)
+    sounds['hurt']:setVolume(0.1)
+    sounds['score']:setVolume(0.1)
+    sounds['pause']:setVolume(0.1)
+
+
+
     -- kick off music
     sounds['music']:setLooping(true)
     sounds['music']:play()
